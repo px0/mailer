@@ -1,20 +1,16 @@
-(defproject clojurewerkz/mailer "1.4.0-SNAPSHOT"
-  :description "An ActionMailer-inspired mailer library. Combines Postal, Clostache, some conventions and support for multiple delivery modes"
-  :url "https://github.com/clojurewerkz/mailer"
+(defproject px0/hiccup-mailer "1.4.0"
+  :description "An ActionMailer-inspired mailer library. Combines Postal, Hiccup, some conventions and support for multiple delivery modes."
+  :url "https://github.com/px0/mailer"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure             "1.7.0"]
+  :dependencies [[org.clojure/clojure             "1.9.0"]
                  [com.draines/postal              "1.11.3"]
-                 [stencil                         "0.3.5"]
-                 [clojurewerkz/support            "1.1.0"]
-                 [clojurewerkz/route-one          "1.1.0"]]
+                 [hiccup "1.0.5"]
+                 ]
   :test-selectors {:focus          :focus
                    :all            (constantly true)}
   :source-paths ["src/clojure"]
-  :profiles {:dev {:resource-paths ["test/resources"]}
-             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC4"]]}
-             :master {:dependencies [[org.clojure/clojure "1.8.0-master-SNAPSHOT"]]}}
-  :aliases { "all" ["with-profile" "dev:dev,1.8:dev,master"] }
+  :profiles {:dev {:resource-paths ["test/resources"]}}
   :repositories {"clojure-releases" "http://build.clojure.org/releases"
                  "sonatype" {:url "http://oss.sonatype.org/content/repositories/releases"
                              :snapshots false

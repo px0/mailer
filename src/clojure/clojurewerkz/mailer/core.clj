@@ -10,8 +10,7 @@
 (ns clojurewerkz.mailer.core
   "Key library functionality: build and deliver email, render templates, et cetera."
   (:require [postal.message   :as msg]
-            [clojure.java.io  :as io]
-            [stencil.core     :as stencil]
+            [hiccup.core :as hiccup]
             [postal.core :refer [send-message]]))
 
 ;;
@@ -40,16 +39,16 @@
 
 (declare build-email)
 (defn deliver-in-test-mode
-  [m ^String template data content-type & more-data]
-  (swap! deliveries conj (apply build-email m template data content-type more-data)))
+  [m template content-type & more-data]
+  (swap! deliveries conj (apply build-email m template content-type more-data)))
 
 (defn deliver-with-smtp
-  [m ^String template data content-type & more-data]
-  (send-message *delivery-settings* (apply build-email m template data content-type more-data)))
+  [m template content-type & more-data]
+  (send-message *delivery-settings* (apply build-email m template content-type more-data)))
 
 (defn deliver-with-sendmail
-  [m ^String template data content-type & more-data]
-  (send-message {} (apply build-email m template data content-type more-data)))
+  [m template content-type & more-data]
+  (send-message {} (apply build-email m template content-type more-data)))
 
 (definline check-not-nil! [v ^String m]
   `(when (nil? ~v)
@@ -88,19 +87,6 @@
      ~@body))
 
 
-(defn render
-  "Renders a template from a resource (so, it has to be on the classpath)"
-  ([^String template]
-     (check-not-nil! template "Template resource name cannot be nil!")
-     (render template {}))
-  ([^String template data]
-     (check-not-nil! template "Template resource name cannot be nil!")
-     (try
-       (stencil/render-file template data)
-       (catch Exception e
-         (throw (RuntimeException. (str "Failed rendering email with template: '" template "', template might not exist.")
-                                   e))))))
-
 (defn- mime-type-str
   [content-type]
   (str (namespace content-type) "/" (name content-type)))
@@ -130,15 +116,19 @@
 
 (defn get-content-with-type
   "Helper which renders contents and assigns content-type."
-  [template data content-type]
-  {:content (render template data)
+  [template content-type]
+  {:content (if (= content-type :text/plain)
+              (if (string? template)
+                template
+                (hiccup/html template))
+              (hiccup/html template))
    :type (get-content-type content-type)})
 
 (defn build-email
-  "Builds up a mail message (returned as an immutable map). Body is rendered from a given template."
-  [m ^String template data content-type & more-data]
+  "Builds up a mail message (returned as an immutable map). Body is rendered from a given hiccup template."
+  [m template content-type & more-data]
   (let [contents (map (partial apply get-content-with-type )
-                      (partition-all 3 (concat [template data content-type] more-data)))]
+                      (partition-all 2 (concat [template content-type] more-data)))]
     (deep-merge-into *message-defaults* m
                      {:body (if (empty? more-data)
                               contents
@@ -147,12 +137,12 @@
 
 (defn deliver-email
   "Delivers a mail message using delivery mode specified by the *delivery-mode* var. Body is rendered from a given template."
-  ([m ^String template data]
-     (deliver-email m template data :text/plain))
-  ([m ^String template data content-type & more-data]
+  ([m template]
+   (deliver-email m template (if (string? template) :text/plain :text/html)))
+  ([m template content-type & more-data]
      (io!
       (if-let [f (get @delivery-modes *delivery-mode*)]
-        (apply f m template data content-type more-data)
+        (apply f m template content-type more-data)
         (throw (IllegalArgumentException. (format  "%s delivery mode implementation is not registered. Possibly you misspelled %s?" *delivery-mode* *delivery-mode*)))))))
 
 
