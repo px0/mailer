@@ -6,3 +6,7 @@ pom.xml*
 .lein-deps-sum
 TAGS
 checkouts/*
+/target/repl-port
+/target/classes/META-INF/maven/px0/hiccup-mailer/pom.properties
+target/*
+/.nrepl-port
