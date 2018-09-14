@@ -1,56 +1,15 @@
-# What is Clojurewerkz Mailer
+# What is Hiccup Mailer
 
-Mailer is an ActionMailer-inspired mailer library for Clojure. It combines [Postal](https://github.com/drewr/postal), [Clostache](https://github.com/fhd/clostache)
-and a number of its own features and conventions to make delivering complex template-based emails as painless as possible.
-
-
-## Project Goals
-
- * Do not reinvent the wheel
- * Email delivery should be testable
- * Steal good parts from ActionMailer
-
-
-## Project Maturity
-
-Mailer is a moderately mature project, the API hasn't changed in several years.
-
-
-
-## Maven Artifacts
-
-Mailer artifacts are [released to Clojars](https://clojars.org/clojurewerkz/mailer).
-If you are using Maven, add the following repository definition to your
-
-`pom.xml`:
-
-``` xml
-<repository>
-  <id>clojars.org</id>
-  <url>http://clojars.org/repo</url>
-</repository>
-```
-
-
-### The Most Recent Release
-
-With Leiningen:
-
-    [clojurewerkz/mailer "1.3.0"]
-
-With Maven:
-
-    <dependency>
-      <groupId>clojurewerkz</groupId>
-      <artifactId>mailer</artifactId>
-      <version>1.3.0</version>
-    </dependency>
-
+Hiccup mailer is my little fork of
+[Mailer](https://github.com/clojurewerkz/mailer). It differs from Mailer in not
+requiring you to provide template resource files, but instead letting you
+provide an email string that you can construct however you want, or optionally
+provide hiccup data that will automatically be converted into HTML.
 
 
 ## Documentation
 
-Mailer uses Mustache templates on the classpath and Postal mail message attribute maps. Key functions are:
+Mailer uses Postal mail message attribute maps. Key functions are:
 
  * `clojurewerkz.mailer.core/build-email`
  * `clojurewerkz.mailer.core/deliver-email`
